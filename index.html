@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Eres más Maricon o Hetero?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            text-align: center;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            z-index: 1;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #1e3a8a;
+            border-radius: 8px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .alerta-Maricon {
+            display: none;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 0, 0, 0);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 1s, background-color 1s;
+            pointer-events: none;
+        }
+
+        .alerta-Maricon.show {
+            display: flex;
+            opacity: 1;
+            background-color: rgba(255, 0, 0, 0.8);
+            pointer-events: auto;
+        }
+
+        .alerta-Maricon .icono {
+            font-size: 150px;
+            margin-bottom: 20px;
+        }
+
+        .alerta-Maricon .mensaje {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .alerta-Maricon .porcentaje {
+            font-size: 48px;
+        }
+
+        .imagen-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .imagen-preview {
+            max-width: 100%;
+            border: 5px solid blue;
+            border-radius: 8px;
+            position: relative;
+            filter: drop-shadow(0 0 0 rgba(30, 58, 138, 0.25));
+        }
+
+        .cuadricula {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to bottom, rgba(0, 0, 255, 0.5) 50%, transparent 50%);
+            background-size: 100% 20px;
+            /* Ajusta la altura de la barra */
+            pointer-events: none;
+            animation: escaneo 2s infinite;
+            display: none;
+        }
+
+        @keyframes escaneo {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 100%;
+            }
+        }
+
+        .texto-imagen {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+            text-align: left;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">Ocaña's apps</div>
+
+    <div class="container">
+        <h1>Detector de Maricones:</h1>
+        <h1>🤨🏳‍🌈?</h1>
+        <input type="text" id="nombre" placeholder="Ingresa tu nombre">
+        <p class="texto-imagen">Imagen (opcional):</p>
+        <input type="file" id="imagen" accept="image/*" onchange="mostrarImagen()">
+        <button onclick="iniciarAnalisis()">Analizar</button>
+        <div class="imagen-container" id="imagen-container" style="display: none;">
+            <img id="imagen-preview" class="imagen-preview">
+            <div class="cuadricula"></div>
+        </div>
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div id="resultado"></div>
+    </div>
+
+    <div class="alerta-Maricon" id="alerta-Maricon">
+        <div class="icono">⚠️</div>
+        <div class="mensaje">¡Alerta de Maricon Cuidado!</div>
+        <div class="porcentaje" id="porcentaje-Maricon"></div>
+    </div>
+
+    <!-- Elemento de audio para el sonido de alerta -->
+    <audio id="sonido-alerta" src="alerta.mp3"></audio>
+
+    <script>
+        function mostrarImagen() {
+            const input = document.getElementById('imagen');
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            if (file) {
+                reader.onload = function (e) {
+                    const imagenPreview = document.getElementById('imagen-preview');
+                    const imagenContainer = document.getElementById('imagen-container');
+                    imagenPreview.src = e.target.result;
+                    imagenContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function iniciarAnalisis() {
+            const nombre = document.getElementById("nombre").value.trim();
+
+            if (nombre === "") {
+                document.getElementById("resultado").innerHTML = "Por favor, ingresa un nombre.";
+                return;
+            }
+
+            // Inicia la animación de escaneo
+            const cuadricula = document.querySelector('.cuadricula');
+            cuadricula.style.display = 'block';
+
+            // Limpia el contenido previo del resultado
+            document.getElementById("resultado").innerHTML = "";
+            document.getElementById("progress-container").style.display = 'block';
+            let progressBar = document.getElementById("progress-bar");
+            progressBar.style.width = "0%";
+
+            let width = 0;
+            let intervalo = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(intervalo);
+                    cuadricula.style.display = 'none'; // Oculta la cuadricula después del análisis
+                    analizarNombre(nombre);
+                } else {
+                    width += 20; // Incrementa en un 20% cada segundo (5 intervalos)
+                    progressBar.style.width = width + "%";
+                }
+            }, 1000); // Cada segundo se incrementa
+        }
+
+        function analizarNombre(nombre) {
+            const seed = nombre.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            const porcentajeMaricon = Math.floor((Math.sin(seed) + 1) * 50);
+            const porcentajeHetero = 100 - porcentajeMaricon;
+
+            let resultado = `Según el análisis, eres ${porcentajeMaricon}% Maricon y ${porcentajeHetero}% Hetero.`;
+
+            const alerta = document.getElementById("alerta-Maricon");
+            const porcentajeElemento = document.getElementById("porcentaje-Maricon");
+            const sonidoAlerta = document.getElementById("sonido-alerta");
+
+            if (porcentajeMaricon >= 75) {
+                porcentajeElemento.innerText = `${porcentajeMaricon}% Maricon`;
+                alerta.classList.add('show');
+
+                // Reproduce el sonido de alerta
+                sonidoAlerta.play();
+
+                // Oculta la alerta después de 5 segundos
+                setTimeout(() => {
+                    alerta.classList.remove('show');
+                    porcentajeElemento.innerText = ''; // Limpia el porcentaje después de que la alerta desaparece
+                }, 5000);
+            } else {
+                alerta.classList.remove('show');
+                porcentajeElemento.innerText = ''; // Limpia el porcentaje si la alerta no se muestra
+            }
+
+            document.getElementById("resultado").innerHTML = resultado;
+            document.getElementById("progress-container").style.display = 'none'; // Oculta la barra de carga
+        }
+    </script>
+
+</body>
+
+</html>
